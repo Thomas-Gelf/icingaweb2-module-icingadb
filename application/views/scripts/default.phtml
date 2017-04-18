@@ -1,0 +1,9 @@
+<?php
+
+use Icinga\Application\Benchmark;
+
+Benchmark::measure('Ready to render') ?>
+<?= $this->controls->render() ?>
+<?php Benchmark::measure('Rendered controls') ?>
+<?= $this->content->render() ?>
+<?php Benchmark::measure('Rendered content') ?>

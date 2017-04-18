@@ -1,0 +1,593 @@
+.action-bar a {
+  color: @icinga-blue;
+  margin-right: 1em;
+  &:hover:before {
+    text-decoration: none;
+  }
+}
+
+p.overview-plugin-output {
+  .preformatted();
+  min-height: 1.5em;
+  max-height: 4.5em;
+  overflow: hidden;
+}
+
+a.icon-reschedule.spin:before {
+  .animate(spin 1s infinite linear);
+}
+
+span.state span.relative-time {
+  display: block;
+  padding: 0;
+  margin: 0;
+  font-size: 0.833em;
+}
+
+table.state-table {
+  a:hover:before {
+    text-decoration: none;
+  }
+
+  td {
+    vertical-align: top;
+  }
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  tr.active[href] {
+    border-left-color: transparent;
+  }
+
+  td:nth-child(2) {
+    width: 100%;
+    padding: 0.1em  1em;
+
+    a {
+      margin-right: 0.5em;
+    }
+
+    a:first-of-type {
+      font-weight: bold;
+    }
+
+    a:focus {
+      outline: none;
+
+    }
+  }
+
+  tr td:first-of-type {
+    padding: 0;
+  }
+
+  span.state {
+    display: block;
+    height: 3.5em;
+    padding-top: 0.3em;
+    text-align: center;
+    border-left: 0.5em solid transparent;
+    margin: 0;
+    padding-right: 0.5em;
+    width: 10em;
+/*
+    height: 100%;
+    overflow:auto;
+    -moz-box-sizing: border-box;
+*/
+  }
+
+  tr.unknown span.state {
+    border-color: @color-unknown;
+    background-color: @color-unknown;
+    color: white;
+  }
+
+  tr.unknown.handled span.state {
+    border-color: @color-unknown-handled;
+    background-color: @color-unknown-handled;
+    color: white;
+  }
+
+  tr.critical span.state {
+    border-color: @color-critical;
+    background-color: @color-critical;
+    color: white;
+  }
+
+  tr.critical.handled span.state {
+    border-color: @color-critical-handled;
+    background-color: @color-critical-handled;
+    color: white;
+  }
+
+  tr.down span.state {
+    border-color: @color-down;
+    background-color: @color-down;
+    color: white;
+  }
+
+  tr.down.handled span.state {
+    border-color: @color-down-handled;
+    background-color: @color-down-handled;
+    color: white;
+  }
+
+  tr.unreachable span.state {
+    border-color: @color-unreachable;
+    background-color: @color-unreachable;
+    color: white;
+  }
+
+  tr.unreachable.handled span.state {
+    border-color: @color-unreachable-handled;
+    background-color: @color-unreachable-handled;
+    color: white;
+  }
+
+  tr.pending span.state {
+    border-color: @color-pending;
+    background-color: @color-pending;
+    color: white;
+  }
+
+  tr.ok span.state {
+    border-color: @color-ok;
+  }
+
+  tr.up span.state {
+    border-color: @color-up;
+  }
+
+  tr td {
+    border-bottom: 1px solid white !important;
+  }
+}
+
+div.statesummary {
+  margin-bottom: 0.5em;
+  float: right;
+
+  ul {
+    list-style-type: none;
+    margin: 0 0.3em 0 0;
+    padding: 0;
+    display: inline;
+  }
+
+  li {
+    display: inline;
+
+    a {
+      color: white;
+      padding: 0.2em 0.5em;
+
+    }
+  }
+
+  li:nth-of-type(2) {
+    border-left: 1px solid white;
+  }
+
+  ul.up li {
+    background-color: @color-up;
+  }
+  ul.ok li {
+    background-color: @color-ok;
+  }
+  ul.critical li {
+    background-color: @color-critical;
+  }
+  ul.critical li.handled {
+    background-color: @color-critical-handled;
+  }
+  ul.down li {
+    background-color: @color-down;
+  }
+  ul.down li.handled {
+    background-color: @color-down-handled;
+  }
+  ul.unreachable li {
+    background-color: @color-unreachable;
+  }
+  ul.unreachable li.handled {
+    background-color: @color-unreachable-handled;
+  }
+  ul.unknown li {
+    background-color: @color-unknown;
+  }
+  ul.unknown li.handled {
+    background-color: @color-unknown-handled;
+  }
+  ul.warning li {
+    background-color: @color-warning;
+  }
+  ul.warning li.handled {
+    background-color: @color-warning-handled;
+  }
+  ul.pending li {
+    background-color: @color-pending;
+  }
+
+  li {
+
+  }
+  li:first-of-type {
+    border-bottom-left-radius: 0.4em;
+    border-top-left-radius: 0.4em;
+  }
+
+  li:last-of-type {
+    border-bottom-right-radius: 0.4em;
+    border-top-right-radius: 0.4em;
+  }
+}
+
+span.state {
+  display: inline-block;
+  height: 3.5em;
+  padding-top: 0.3em;
+  text-align: center;
+  border-left: 0.5em solid transparent;
+  margin: 0;
+  padding-right: 0.5em;
+  width: 10em;
+
+  &.unknown {
+    border-color: @color-unknown;
+    background-color: @color-unknown;
+    color: white;
+  }
+
+  &.unknown.handled {
+    border-color: @color-unknown-handled;
+    background-color: @color-unknown-handled;
+    color: white;
+  }
+
+  &.down {
+    border-color: @color-down;
+    background-color: @color-down;
+    color: white;
+  }
+
+  &.down.handled {
+    border-color: @color-down-handled;
+    background-color: @color-down-handled;
+    color: white;
+  }
+
+  &.unreachable {
+    border-color: @color-unreachable;
+    background-color: @color-unreachable;
+    color: white;
+  }
+
+  &.unreachable.handled {
+    border-color: @color-unreachable-handled;
+    background-color: @color-unreachable-handled;
+    color: white;
+  }
+
+  &.pending {
+    border-color: @color-pending;
+    background-color: @color-pending;
+    color: white;
+  }
+
+  &.up {
+    border-color: @color-ok;
+  }
+}
+
+.object-header {
+  h1 {
+    display: block;
+    min-width: 20em;
+    font-size: 1em;
+    vertical-align: top;
+    border-bottom: none;
+    margin: 0;
+  }
+
+  span.state {
+    height: 3.8em;
+    vertical-align: top;
+    width: 8em;
+  }
+
+  > .header-details {
+    padding-left: 0.5em;
+    display: inline-block;
+  }
+}
+
+/** Forms stolen from director **/
+.content form {
+  margin-bottom: 2em;
+}
+
+.content form.inline {
+  margin: 0;
+}
+
+.invisible {
+  position: absolute;
+  left: -100%;
+}
+
+form input[type=file] {
+  background-color: white;
+  padding-right: 1em;
+}
+
+
+form input[type=submit] {
+  .button();
+  border-width: 1px;
+  margin-top: 0.5em;
+
+  &:disabled {
+    border-color: @gray-light;
+    background-color: @gray-light;
+    color: #fff;
+  }
+}
+
+form input[type=submit]:first-of-type {
+  border-width: 2px;
+}
+
+form input[type=submit].link-button {
+  color: @icinga-blue;
+  background: none;
+  border: none;
+  padding: 0;
+
+  text-align: left;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+form p.description {
+  padding: 1em 1em;
+  margin: 0;
+  font-style: italic;
+  width: 100%;
+}
+
+input[type=text], input[type=button], select, select option, textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+form ul.form-errors {
+  margin-bottom: 0.5em;
+
+  ul.errors li {
+    background: @color-critical;
+    font-weight: bold;
+    padding: 0.5em 1em;
+    color: white;
+  }
+}
+
+select::-ms-expand, input::-ms-expand, textarea::-ms-expand { /* for IE 11 */
+  display: none;
+}
+
+select {
+  border: 1px solid #ddd;
+  cursor: pointer;
+  background: none;
+}
+
+input[type=text], input[type=password], textarea, select {
+  max-width: 36em;
+  min-width: 20em;
+  width: 100%;
+  line-height: 2em;
+  height: 2.4em;
+  padding-left: 0.5em;
+  border-style: solid;
+  border-color: transparent;
+  border-bottom-color: @gray-lighter;
+  border-width: 1px 1px 1px 3px;
+  background-color: white;
+
+  &.search {
+    background: transparent url("../img/icons/search.png") no-repeat scroll 0.5em center / 1em 1em;
+    padding-left: 2em;
+  }
+}
+
+select[multiple] {
+  height: auto;
+}
+
+select option {
+  height: 2em;
+  padding-top: 0.3em;
+}
+
+select[multiple=multiple] {
+  height: auto;
+}
+
+label {
+  line-height: 2em;
+}
+
+form dl {
+  margin: 0;
+  padding: 0;
+}
+
+select::-moz-focus-inner { border: 0; }
+
+select:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+select, input[type=text], textarea {
+  &:hover {
+    border-style: dotted solid dotted solid;
+    border-color: @gray-light;
+  }
+
+  &:focus, &:focus:hover {
+    border-style: solid;
+    border-color: @icinga-blue;
+    outline: none;
+  }
+}
+
+select[value=""] {
+  color: blue;
+  border: 1px solid #666;
+  background-color: white;
+}
+
+select option {
+  color: inherit;
+  padding-left: 0.5em;
+  background-color: white;
+}
+
+select option[value=""] {
+  color: #aaa;
+  background-color: white;
+}
+
+form dt label {
+  width: auto;
+  font-weight: normal;
+  font-size: inherit;
+
+  &.required {
+    &::after {
+      content: '*'
+    }
+  }
+
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+form fieldset {
+  min-width: 36em;
+}
+
+form dd input.related-action[type='submit'] {
+  display: none;
+}
+
+form dd.active li.active input.related-action[type='submit'] {
+  display: inline-block;
+}
+
+form dd.active {
+  p.description {
+    color: inherit;
+    font-style: normal;
+  }
+}
+
+form dd {
+  padding: 0.3em 0.5em;
+  margin: 0;
+}
+
+form dt {
+  padding: 0.5em 0.5em;
+  margin: 0;
+}
+
+form dt.active, form dd.active {
+  background-color: @tr-active-color;
+}
+
+form dt {
+  display: inline-block;
+  vertical-align: top;
+  min-width: 12em;
+  min-height: 2.5em;
+  width: 30%;
+  &.errors label {
+    color: @color-critical;
+  }
+}
+
+form .errors label {
+  color: @color-critical;
+}
+
+form dd {
+  display: inline-block;
+  width: 63%;
+  min-height: 2.5em;
+  vertical-align: top;
+  margin: 0;
+  &.errors {
+    input[type=text], select {
+      border-color: @color-critical;
+    }
+  }
+
+  &.full-width {
+    padding: 0.5em;
+    width: 100%;
+  }
+}
+
+form dd:after {
+  display: block;
+  content: '';
+}
+
+form textarea {
+  height: auto;
+}
+
+form dd ul.errors {
+  list-style-type: none;
+  padding-left: 0.3em;
+
+  li {
+    color: @colorCritical;
+    padding: 0.3em;
+  }
+}
+
+form div.hint {
+  padding: 1em;
+  background-color: @tr-hover-color;
+  margin: 1em 0;
+  max-width: 65em;
+  font-size: 1em;
+
+  pre {
+    font-style: normal;
+    background-color: white;
+    margin: 0;
+    padding: 1em;
+  }
+}
+
+
+form {
+  #_FAKE_SUBMIT {
+    position: absolute;
+    left: -100%;
+  }
+}
+
+/** END of forms **/
