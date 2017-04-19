@@ -14,8 +14,7 @@ Dependencies
 * MySQL (>= 5.5, higher is better)/MariaDB. PostgreSQL support will follow
 * Redis server on your Icinga Web 2 system (>= 2.8)
 * Icinga 2 instance(s) with (experimental) Redis feature enabled
-* A redis server listening locally on your Icinga 
-* Stunnel 
+* Stunnel exporting Redis (on Icinga node)
 
 Installation
 ------------
