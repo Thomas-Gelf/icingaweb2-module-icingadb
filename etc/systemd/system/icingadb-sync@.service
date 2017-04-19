@@ -1,0 +1,14 @@
+[Unit]
+Description=IcingaDB Config Sync (%i)
+Documentation=https://github.com/Icinga/icingaweb2-module-icingadb/blob/master/README.md
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/icingacli icingadb config sync --environment "%i" --trace --verbose
+Restart=always
+RestartSec=0
+User=icingaweb2
+
+[Install]
+WantedBy=multi-user.target

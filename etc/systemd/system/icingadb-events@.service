@@ -1,0 +1,14 @@
+[Unit]
+Description=IcingaDB Event Stream (%i)
+Documentation=https://github.com/Icinga/icingaweb2-module-icingadb/blob/master/README.md
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/icingacli icingadb events process --environment "%i" --verbose
+Restart=always
+RestartSec=0
+User=icingaweb2
+
+[Install]
+WantedBy=multi-user.target
