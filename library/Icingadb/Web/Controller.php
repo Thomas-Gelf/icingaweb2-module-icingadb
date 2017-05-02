@@ -5,135 +5,39 @@ namespace Icinga\Module\Icingadb\Web;
 use Icinga\Application\Benchmark;
 use Icinga\Application\Config;
 use Icinga\Exception\ConfigurationError;
-use ipl\Html\HtmlTag;
-use ipl\Web\Component\Content;
-use ipl\Web\Component\Controls;
-use ipl\Web\Component\Tabs;
-use ipl\Web\Url;
+use ipl\Html\Link;
+use ipl\Web\CompatController;
 use Icinga\Module\Icingadb\IcingaDb;
 use Icinga\Module\Icingadb\Redis;
 use Icinga\Module\Director\Db;
 use Icinga\Module\Director\Objects\IcingaEndpoint;
-use Icinga\Web\Controller as WebController;
 
-class Controller extends WebController
+class Controller extends CompatController
 {
     /** @var \Zend_Db_Adapter_Abstract */
     private $db;
 
     /** @var IcingaDb */
-    private $ddo;
+    private $icingaDb;
 
     /** @var Redis */
     private $redis;
-
-    private $mytabs;
 
     private $directorDb;
 
     private $api;
 
-    private $url;
-
-    public function init()
+    protected function createAddLink($what)
     {
-        Benchmark::measure('Ready to initialize the controller');
-        $this->controls();
-        $this->content();
-        $this->setViewScript('default');
-    }
-
-    /**
-     * @return Url
-     */
-    protected function url()
-    {
-        if ($this->url === null) {
-            $webUrl = $this->getRequest()->getUrl();
-            $this->url = Url::fromPath(
-                $webUrl->getPath()
-            )->setParams($webUrl->getParams());
-        }
-
-        return $this->url;
-    }
-
-    /**
-     * @return Controls
-     */
-    protected function controls()
-    {
-        if ($this->view->controls === null) {
-            $this->view->controls = Controls::create();
-        }
-
-        return $this->view->controls;
-    }
-
-    protected function setViewScript($name)
-    {
-        $this->_helper->viewRenderer->setNoController(true);
-        $this->_helper->viewRenderer->setScriptAction($name);
-        return $this;
-    }
-
-    protected function setTitle($title)
-    {
-        $args = func_get_args();
-        array_shift($args);
-        $this->view->title = vsprintf($title, $args);
-        return $this;
-    }
-
-    protected function addTitle($title)
-    {
-        $args = func_get_args();
-        array_shift($args);
-        $this->view->title = vsprintf($title, $args);
-        $this->controls()->add(HtmlTag::h1($this->view->title));
-        return $this;
-    }
-
-    /**
-     * @param $label
-     * @return Tabs
-     */
-    protected function singleTab($label)
-    {
-        return $this->tabs()->add(
-            'tab',
-            array(
-                'label' => $label,
-                'url'   => $this->getRequest()->getUrl()
-            )
-        )->activate('tab');
-    }
-
-    /**
-     * @return Tabs
-     */
-    protected function tabs()
-    {
-        // Todo: do not add to view once all of them render controls()
-        if ($this->mytabs === null) {
-            $tabs = new Tabs();
-            $this->controls()->prepend($tabs);
-            $this->mytabs = $tabs;
-        }
-
-        return $this->mytabs;
-    }
-
-    /**
-     * @return Content
-     */
-    protected function content()
-    {
-        if ($this->view->content === null) {
-            $this->view->content = Content::create();
-        }
-
-        return $this->view->content;
+        return Link::create(
+            'Add',
+            sprintf('director/%s/add', $what),
+            [],
+            [
+                'class' => 'icon-plus',
+                'data-base-target' => '_next'
+            ]
+        );
     }
 
     /**
@@ -142,7 +46,7 @@ class Controller extends WebController
     protected function db()
     {
         if ($this->db === null) {
-            $this->db = $this->ddo()->getDbAdapter();
+            $this->db = $this->icingaDb()->getDbAdapter();
         }
 
         return $this->db;
@@ -174,7 +78,7 @@ class Controller extends WebController
             if ($endpointName === null) {
                 $endpoint = $this->directorDb()->getDeploymentEndpoint();
             } else {
-                $endpoint = IcingaEndpoint::load($endpointName, $this->db());
+                $endpoint = IcingaEndpoint::load($endpointName, $this->icingaDb());
             }
 
             $this->api = $endpoint->api();
@@ -204,20 +108,20 @@ class Controller extends WebController
      * @return IcingaDb
      * @throws ConfigurationError
      */
-    protected function ddo()
+    protected function icingaDb()
     {
-        if ($this->ddo === null) {
-            Benchmark::measure('Getting ddo()');
+        if ($this->icingaDb === null) {
+            Benchmark::measure('Getting icingaDb');
 
             $resourceName = $this->Config()->get('db', 'resource');
             if ($resourceName) {
-                $this->ddo = IcingaDb::fromResourceName($resourceName);
-                Benchmark::measure('Created (and connected) ddo resource');
+                $this->icingaDb = IcingaDb::fromResourceName($resourceName);
+                Benchmark::measure('Created (and connected) IcingaDB resource');
             } else {
-                throw new ConfigurationError('(icingadb) DDO is not configured correctly');
+                throw new ConfigurationError('(icingadb) DB is not configured correctly');
             }
         }
 
-        return $this->ddo;
+        return $this->icingaDb;
     }
 }

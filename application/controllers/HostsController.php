@@ -18,18 +18,22 @@ class HostsController extends Controller
         $this->handleQuickActions();
         $this->setAutorefreshInterval(10);
         $title = $this->translate('Hosts');
-        $this->singleTab($title);
-        $this->controls()->add(
-            new HostStateSummaryBadges(HostStateSummary::fromDb($this->ddo()))
-        );
         $this->addTitle($title);
+        $this->controls()->prepend(
+            new HostStateSummaryBadges(HostStateSummary::fromDb($this->icingaDb()))
+        );
+        $this->addSingleTab($title);
+        $this->actions()->add(
+            $this->createAddLink('host')
+        );
+
         $this->content()->add($this->getHostsTable());
     }
 
     public function summaryAction()
     {
         $this->content()->add(
-            new HostStateSummaryBadges(HostStateSummary::fromDb($this->ddo()))
+            new HostStateSummaryBadges(HostStateSummary::fromDb($this->icingaDb()))
         );
     }
 }

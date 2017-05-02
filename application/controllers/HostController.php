@@ -16,21 +16,21 @@ class HostController extends Controller
     public function showAction()
     {
         $name = $this->params->get('name');
-        $ddo = $this->ddo();
-        $env = IcingaEnvironment::load($this->params->get('env'), $ddo);
+        $db = $this->icingaDb();
+        $env = IcingaEnvironment::load($this->params->get('env'), $db);
         $checksum = $env->generateGlobalChecksum($name);
-        $host = IcingaHostConfig::load($checksum, $ddo);
-        $state = HostState::load($checksum, $ddo);
+        $host = IcingaHostConfig::load($checksum, $db);
+        $state = HostState::load($checksum, $db);
         $volatile = HostStateVolatile::failSafeFromRedis($this->redis(), $checksum);
 
         $this->setAutorefreshInterval(10);
         $this->controls()->attributes()->add('class', 'controls-separated');
-        $this->singleTab($this->translate('Host'));
-        $this->setTitle(sprintf($this->translate('Host: %s'), $name));
+        $this->addSingleTab($this->translate('Host'));
+        $this->addTitle($name);
 
         $this->controls()
-            ->add(new HostHeader($host, $state))
-            ->add(new HostActionBar($host, $state));
+            ->add(new HostActionBar($host, $state))
+            ->add(new HostHeader($host, $state));
 
         $this->content()
             ->add(new HostDetails($env, $host, $state, $volatile));

@@ -12,17 +12,17 @@ class EnvironmentsController extends Controller
 {
     public function indexAction()
     {
+        $db = $this->icingaDb();
         $this->setAutorefreshInterval(10);
-        $title = $this->translate('Environments');
-        $this->singleTab($title);
-        $this->addTitle($title);
+        $this->addSingleTab($this->translate('Environments'));
+        $this->addTitle($this->translate('All your Icinga Environments'));
         $this->content()->add($table = new EnvironmentsTable());
-        $table->renderEnvironments(IcingaEnvironment::loadAll($this->ddo()));
+        $table->renderEnvironments(IcingaEnvironment::loadAll($db));
         $this->content()->add(
             Element::create('h1')->setContent('Add a new one:')
         )->add(
             (new IcingaEnvironmentForm())
-                ->setIcingaDb($this->ddo())
+                ->setIcingaDb($db)
                 ->handleRequest()
         );
     }

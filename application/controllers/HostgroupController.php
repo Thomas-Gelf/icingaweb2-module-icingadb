@@ -24,18 +24,18 @@ class HostgroupController extends Controller
         $name = $this->params->get('name');
         // Used by HostsTableHelper :-/
         $this->params->set('hostgroup', $name);
-        $ddo = $this->ddo();
-        $env = IcingaEnvironment::load($this->params->get('env'), $ddo);
+        $db = $this->icingaDb();
+        $env = IcingaEnvironment::load($this->params->get('env'), $db);
         $checksum = $env->generateGlobalChecksum($name);
-        $hostGroup = IcingaHostGroupConfig::load($checksum, $ddo);
+        $hostGroup = IcingaHostGroupConfig::load($checksum, $db);
 
         $this->setAutorefreshInterval(10);
-        $this->singleTab($this->translate('Host Group'));
+        $this->addSingleTab($this->translate('Host Group'));
         $this->setTitle(sprintf($this->translate('Host Group: %s'), $name));
 
         $this->controls()->add(
             new HostStateSummaryBadges(
-                HostStateSummary::fromDb($this->ddo())->setHostGroupChecksum($checksum),
+                HostStateSummary::fromDb($db)->setHostGroupChecksum($checksum),
                 Url::fromPath('icingadb/hostgroup', [
                     'name' => $name,
                     'env'  => $env->get('name')

@@ -18,9 +18,9 @@ class ServicesController extends Controller
         $this->handleQuickActions();
         $this->setAutorefreshInterval(10);
         $title = $this->translate('Services');
-        $this->singleTab($title);
+        $this->addSingleTab($title);
         $this->controls()->add(
-            new ServiceStateSummaryBadges(ServiceStateSummary::fromDb($this->ddo()))
+            new ServiceStateSummaryBadges(ServiceStateSummary::fromDb($this->icingaDb()))
         );
         $this->addTitle($title);
         $this->content()->add($this->getServicesTable());
@@ -29,7 +29,7 @@ class ServicesController extends Controller
     public function summaryAction()
     {
         $this->content()->add(
-            new ServiceStateSummaryBadges(ServiceStateSummary::fromDb($this->ddo()))
+            new ServiceStateSummaryBadges(ServiceStateSummary::fromDb($this->icingaDb()))
         );
     }
 }
