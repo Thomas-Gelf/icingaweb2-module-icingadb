@@ -16,9 +16,9 @@ class FullDiff
 
     const PROPERTIES_CHECKSUM = 2;
 
-    const GROUPS_CHECKSUM = 3;
+    const VARS_CHECKSUM = 3;
 
-    const VARS_CHECKSUM = 4;
+    const GROUPS_CHECKSUM = 4;
 
     /** @var SplFixedArray[] */
     private $active;
@@ -50,7 +50,7 @@ class FullDiff
     public function run()
     {
         $this->changeSet = new ChangeSet();
-        Benchmark::measure(sprintf('FullDiff ready to diff %s', $this->objectType));
+        Benchmark::measure(sprintf('FullDiff ready to diff "%s"', $this->objectType));
         $this->fetchStoredKeys();
         $cnt = count($this->stored);
         $this->changeSet->setCountOld($cnt);
@@ -108,8 +108,8 @@ class FullDiff
                 'name'                => 'o.name',
                 'name_checksum'       => 'o.name_checksum',
                 'properties_checksum' => 'o.properties_checksum',
+                'vars_checksum'       => 'o.vars_checksum',
                 'groups_checksum'     => 'o.groups_checksum',
-                'vars_checksum'       => 'o.vars_checksum'
             ];
         }
     }
@@ -144,16 +144,20 @@ class FullDiff
         foreach ($this->fetchFullHashFromRedis($key) as $name => $json) {
             $row = json_decode($json);
             $key = hex2bin($row->name_checksum);
-            if (property_exists($row,   'groups_checksum')) {
+            if (property_exists($row, 'groups_checksum')) {
                 $active[$key] = SplFixedArray::fromArray([
                     $name, // todo -> use less space, do not store this
                     $key,
+                    hex2bin($row->properties_checksum),
+                    hex2bin($row->vars_checksum),
                     hex2bin($row->groups_checksum),
                 ]);
             } else {
                 $active[$key] = SplFixedArray::fromArray([
                     $name, // todo -> use less space, do not store this
                     $key,
+                    hex2bin($row->properties_checksum),
+                    hex2bin($row->vars_checksum),
                 ]);
             }
         }
@@ -163,6 +167,7 @@ class FullDiff
     protected function detectObjectModifications()
     {
         $changes = $this->changeSet;
+
         foreach ($this->active as $sum => & $sums) {
             if (array_key_exists($sum, $this->stored)) {
                 $stored = & $this->stored[$sum];
@@ -173,11 +178,19 @@ class FullDiff
                         $sum
                     );
                 }
-                /*
-                if ($stored[self::PROPERTIES_CHECKSUM] !== $sums[self::PROPERTIES_CHECKSUM]) {
-                    $changes->modify($sum, $sums);
+                if (! $this->isGroup()) {
+                    if ($stored[self::PROPERTIES_CHECKSUM] !== $sums[self::PROPERTIES_CHECKSUM]) {
+                        $changes->modify($sum, $sums);
+                    }
+                    if ($stored[self::VARS_CHECKSUM] !== $sums[self::VARS_CHECKSUM]) {
+                        $changes->modify($sum, $sums);
+                    }
+                    if ($sums->offsetExists(self::GROUPS_CHECKSUM)) {
+                        if ($stored[self::GROUPS_CHECKSUM] !== $sums[self::GROUPS_CHECKSUM]) {
+                            $changes->modify($sum, $sums);
+                        }
+                    }
                 }
-                */
             } else {
                 $changes->create($sum, $sums);
             }
