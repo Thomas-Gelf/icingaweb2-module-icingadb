@@ -2,6 +2,8 @@
 
 namespace Icinga\Module\Icingadb\Monitoring;
 
-class PerformanceData
+use Icinga\Module\Monitoring\Plugin\Perfdata;
+
+class PerformanceData extends Perfdata
 {
 }
