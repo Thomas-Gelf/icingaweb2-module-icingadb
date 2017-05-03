@@ -110,7 +110,7 @@ class VolatileStateObject extends DdoObject
     {
         if (is_array($checksum)) {
             Benchmark::measure(sprintf('Fetching %d keys from redis', count($checksum)));
-            $keys = array_map(__CLASS__ . '::prefix', $checksum);
+            $keys = array_map(static::class . '::prefix', $checksum);
             $encoded = $redis->mget($keys);
             $result = array();
             foreach ($encoded as $key => $json) {
