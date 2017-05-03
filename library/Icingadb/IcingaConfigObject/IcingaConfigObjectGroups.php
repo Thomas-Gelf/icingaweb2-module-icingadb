@@ -2,6 +2,8 @@
 
 namespace Icinga\Module\Icingadb\IcingaConfigObject;
 
+use Icinga\Exception\ProgrammingError;
+
 trait IcingaConfigObjectGroups
 {
     private $groups = [];
@@ -14,9 +16,16 @@ trait IcingaConfigObjectGroups
 
     public function setGroups(array $groupNames)
     {
+        $env = $this->get('env_checksum');
+        if ($env === null) {
+            throw new ProgrammingError(
+                'Cannot calculate groups checksum without an environment'
+            );
+        }
+
         $this->groups = [];
         foreach ($groupNames as $name) {
-            $key = sha1($name, true);
+            $key = sha1($env . sha1($name, true), true);
             $this->groups[$key] = $name;
         }
 

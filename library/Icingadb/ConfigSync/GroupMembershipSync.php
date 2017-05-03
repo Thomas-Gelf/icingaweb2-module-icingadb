@@ -169,7 +169,7 @@ abstract class GroupMembershipSync
         return $this->db->select()->from(
             ['ics' => $inconsistentSums],
             [
-                'global_host_checksum'       => 'ics.checksum',
+                'global_host_checksum'      => 'ics.checksum',
                 'global_hostgroup_checksum' => "gm.global_${type}group_checksum"
             ]
         )->joinLeft(
@@ -194,7 +194,7 @@ abstract class GroupMembershipSync
         $query = $this->db->select()->from(
             ['o' => "${type}_config"],
             [
-                'checksum' => 'o.global_checksum',
+                'checksum'                 => 'o.global_checksum',
                 'expected_groups_checksum' => 'o.groups_checksum',
                 'actual_groups_checksum'   => $actualGroupsChecksum
             ]
