@@ -9,7 +9,7 @@ use Icinga\Module\Icingadb\Web\Component\Form;
 class IcingaEnvironmentForm extends Form
 {
     /** @var IcingaDb */
-    protected $ddoDb;
+    protected $icingaDb;
 
     public function setup()
     {
@@ -24,16 +24,16 @@ class IcingaEnvironmentForm extends Form
         ]);
     }
 
-    public function setIcingaDb(IcingaDb $ddo)
+    public function setIcingaDb(IcingaDb $icingaDb)
     {
-        $this->ddoDb = $ddo;
+        $this->icingaDb = $icingaDb;
         return $this;
     }
 
     public function onSuccess()
     {
         $values = $this->getValues();
-        $db = $this->ddoDb->getDbAdapter();
+        $db = $this->icingaDb->getDbAdapter();
         $db->insert('icinga_environment', [
             'name' => $values['name'],
             'name_checksum' => sha1($values['name'], true),

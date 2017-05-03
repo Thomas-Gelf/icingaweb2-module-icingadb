@@ -61,6 +61,6 @@ class MigrationCommand extends Command
 
     protected function migrations()
     {
-        return new Migrations($this->ddo());
+        return new Migrations($this->icingaDb());
     }
 }

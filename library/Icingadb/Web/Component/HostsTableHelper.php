@@ -2,7 +2,7 @@
 
 namespace Icinga\Module\Icingadb\Web\Component;
 
-use ipl\Web\Url;
+use Icinga\Module\Icingadb\Web\Controller;
 use Icinga\Module\Icingadb\IcingaStateObject\HostStateVolatile;
 use Icinga\Module\Icingadb\IcingaStateObject\StateObject;
 use Icinga\Module\Icingadb\View\HostsView;
@@ -12,12 +12,14 @@ trait HostsTableHelper
 {
     protected function getHostsTable()
     {
+        /** @var Controller $this */
+
         $params = $this->params;
 
         HostStateVolatile::setRedis($this->redis());
         $envName = $params->get('env');
         $table = new HostsTable();
-        $view = new HostsView($this->ddo());
+        $view = new HostsView($this->icingaDB());
 
         $preserveParams = array('state', 'handled', 'hostgroup');
         $preserve = [];

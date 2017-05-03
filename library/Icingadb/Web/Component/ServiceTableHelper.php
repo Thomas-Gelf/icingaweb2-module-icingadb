@@ -17,7 +17,7 @@ trait ServiceTableHelper
         HostStateVolatile::setRedis($this->redis());
         $envName = $params->get('env');
         $table = new ServicesTable();
-        $view = new ServicesView($this->ddo());
+        $view = new ServicesView($this->icingaDB());
 
         $preserveParams = array('state', 'handled', 'hostgroup');
         $preserve = [];

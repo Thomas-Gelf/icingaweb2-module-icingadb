@@ -8,7 +8,7 @@ use PDO;
 
 abstract class ListView
 {
-    private $ddo;
+    private $icingaDb;
 
     private $db;
 
@@ -18,10 +18,10 @@ abstract class ListView
     /** @var callable[] */
     private $rowObservers = array();
 
-    public function __construct(IcingaDb $ddo)
+    public function __construct(IcingaDb $icingaDb)
     {
-        $this->ddo = $ddo;
-        $this->db = $ddo->getDbAdapter();
+        $this->icingaDb = $icingaDb;
+        $this->db = $icingaDb->getDbAdapter();
     }
 
     abstract public function getColumns();

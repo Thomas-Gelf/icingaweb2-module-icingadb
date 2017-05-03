@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Icingadb\Cli;
 
+use Icinga\Application\Config;
 use Icinga\Module\Icingadb\IcingaDb;
 use Icinga\Module\Icingadb\IcingaEnvironment\IcingaEnvironment;
 use Icinga\Module\Icingadb\Redis;
@@ -10,7 +11,7 @@ use Icinga\Cli\Command as CliCommand;
 class Command extends CliCommand
 {
     /** @var IcingaDb */
-    private $ddo;
+    private $icingaDb;
 
     /** @var Redis */
     private $redis;
@@ -37,7 +38,7 @@ class Command extends CliCommand
     {
         if ($this->environment === null) {
             $env = $this->params->getRequired('environment');
-            $this->environment = IcingaEnvironment::load($env, $this->ddo());
+            $this->environment = IcingaEnvironment::load($env, $this->icingaDb());
         }
 
         return $this->environment;
@@ -46,18 +47,18 @@ class Command extends CliCommand
     /**
      * @return IcingaDb
      */
-    protected function ddo()
+    protected function icingaDb()
     {
-        if ($this->ddo === null) {
-            $resourceName = $this->Config()->get('db', 'resource');
+        if ($this->icingaDb === null) {
+            $resourceName = Config::module('icingadb')->get('db', 'resource');
             if ($resourceName) {
-                $this->ddo = IcingaDb::fromResourceName($resourceName);
+                $this->icingaDb = IcingaDb::fromResourceName($resourceName);
             } else {
                 $this->fail('(icingadb) DDO is not configured correctly');
             }
         }
 
-        return $this->ddo;
+        return $this->icingaDb;
     }
 
     protected function setProcessTitle($title)
@@ -69,7 +70,7 @@ class Command extends CliCommand
 
     protected function clearConnections()
     {
-        $this->ddo   = null;
+        $this->icingaDb = null;
         $this->redis = null;
         return $this;
     }

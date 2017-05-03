@@ -31,8 +31,10 @@ class TroubleshootCommand extends Command
 
     public function hostvarsAction()
     {
+        $icingaDb = $this->icingaDb();
         $distinct = $this->redisProxy()->fetchDistinctObjectVars('Host');
-        $store = new CustomVarBulkStore($this->ddo());
+        $store = new CustomVarBulkStore($icingaDb);
+
         foreach ($distinct as $setSum => $vars) {
             foreach ((array) $vars as $name => $value) {
                 $store->addCustomVar(new CustomVar($name, $value));
