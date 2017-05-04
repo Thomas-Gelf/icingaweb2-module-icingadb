@@ -527,10 +527,23 @@ CREATE TABLE user_var (
 ) ENGINE=InnoDb ROW_FORMAT=DYNAMIC DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_bin;
 
 CREATE TABLE custom_var_set (
+  global_checksum BINARY(20) NOT NULL,
+  env_checksum BINARY(20) NOT NULL,
+  icinga_set_checksum BINARY(20) NOT NULL, -- temporary workaround
+  set_checksum BINARY(20) NOT NULL, -- to be used once variable checksums are specified
+  PRIMARY KEY (global_checksum),
+  UNIQUE KEY (env_checksum, icinga_set_checksum)
+) ENGINE=InnoDb ROW_FORMAT=DYNAMIC DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_bin;
+
+CREATE TABLE custom_var_set_var (
   set_checksum BINARY(20) NOT NULL,
   var_checksum BINARY(20) NOT NULL,
   PRIMARY KEY (set_checksum, var_checksum),
-  FOREIGN KEY custom_var_set_var_checksum (var_checksum)
+  FOREIGN KEY custom_var_set_var_set (set_checksum)
+  REFERENCES custom_var_set (global_checksum)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+    FOREIGN KEY custom_var_set_var_var (var_checksum)
   REFERENCES custom_var (checksum)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT

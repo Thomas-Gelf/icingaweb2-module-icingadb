@@ -6,7 +6,8 @@ use Icinga\Application\Benchmark;
 use Icinga\Module\Icingadb\Cli\Command;
 use Icinga\Module\Icingadb\CustomVar\CustomVar;
 use Icinga\Module\Icingadb\CustomVar\CustomVarBulkStore;
-use Icinga\Module\Icingadb\CustomVar\CustomVars;
+use Icinga\Module\Icingadb\CustomVar\CustomVarSet;
+use Icinga\Module\Icingadb\CustomVar\CustomVarString;
 use Icinga\Module\Icingadb\Director\DirectorDummyObjects;
 use Icinga\Module\Icingadb\Redis\IcingaRedisProxy;
 
@@ -32,16 +33,47 @@ class TroubleshootCommand extends Command
     public function hostvarsAction()
     {
         $icingaDb = $this->icingaDb();
+        $env = $this->getEnvironment();
         $distinct = $this->redisProxy()->fetchDistinctObjectVars('Host');
         $store = new CustomVarBulkStore($icingaDb);
 
+        $db = $icingaDb->getDbAdapter();
+        $query = $db->select()
+            ->from('custom_var_set', 'icinga_set_checksum')
+            ->where('env_checksum = ?', $env->getNameChecksum());
+        $existing = $db->fetchCol($query);
+        $existing = array_flip($existing);
+
+        /** @var CustomVarSet[] $newSets */
+        $newSets = [];
+
         foreach ($distinct as $setSum => $vars) {
+            if (array_key_exists($setSum, $existing)) {
+                $setVars = null;
+            } else {
+                $setVars = [];
+            }
+
             foreach ((array) $vars as $name => $value) {
-                $store->addCustomVar(new CustomVar($name, $value));
+                $var = new CustomVar($name, $value);
+                $store->addCustomVar($var);
+
+                if (null !== $setVars) {
+                    $setVars[] = $var;
+                }
+            }
+
+            if (null !== $setVars) {
+                $newSets[] = CustomVarSet::createLegacy($env, $setSum, $setVars);
             }
         }
 
+        $db->beginTransaction();
+        foreach ($newSets as $set) {
+            $set->storeToDb($icingaDb);
+        }
         $store->store();
+        $db->commit();
     }
 
     public function hostgroupsAction()
