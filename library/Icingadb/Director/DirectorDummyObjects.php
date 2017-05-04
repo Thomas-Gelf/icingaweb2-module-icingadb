@@ -29,7 +29,7 @@ class DirectorDummyObjects
                 'object_type' => 'object',
                 'object_name' => $name,
                 'address'     => '127.0.0.' . (($i % 253) + 1),
-                'imports'     => 'DDO Random Host',
+                'imports'     => 'IcingaDB Random Host',
                 'zone'        => 'satellites1',
                 // 'vars'        => $vars
             ], $ddb);
@@ -49,7 +49,7 @@ class DirectorDummyObjects
     public function createRandomCheckCommand()
     {
         $db = $this->db;
-        $cmdName = 'DDO random fortune';
+        $cmdName = 'IcingaDB random fortune';
 
         $argument = IcingaCommandArgument::create([
             'argument_name'   => '(no key)',
@@ -98,7 +98,7 @@ class DirectorDummyObjects
     public function createRandomHostTemplate()
     {
         $db = $this->db;
-        $hostName = 'DDO Random Host';
+        $hostName = 'IcingaDB Random Host';
         if (IcingaHost::exists($hostName, $db)) {
             $host = IcingaHost::load($hostName, $db);
         } else {
@@ -118,7 +118,7 @@ class DirectorDummyObjects
             'enable_event_handler'  => 'y',
             'enable_perfdata'       => 'y',
             'volatile'              => 'n',
-            'check_command'         => 'DDO random fortune',
+            'check_command'         => 'IcingaDB random fortune',
         ];
 
         foreach ($properties as $key => $val) {
