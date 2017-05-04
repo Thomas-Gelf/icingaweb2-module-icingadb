@@ -2,6 +2,8 @@
 
 namespace Icinga\Module\Icingadb\Web\Component;
 
+use Icinga\Module\Director\Core\CoreApi;
+use Icinga\Module\Icingadb\Web\Controller;
 use Icinga\Web\Notification;
 use Exception;
 
@@ -9,12 +11,20 @@ trait HostActionsHelper
 {
     protected function handleQuickActions()
     {
+        /** @var Controller $this */
+
         // TODO: Move this elsewhere
         $action = $this->params->shift('action');
         $hostname = $this->params->get('host');
+        if (! $action) {
+            return;
+        }
+
+        /** @var CoreApi $api */
+        $api = $this->api();
         if ($action === 'checkNow') {
             try {
-                $res = $this->api()->checkHostAndWaitForResult($hostname, 2);
+                $res = $api->checkHostAndWaitForResult($hostname, 2);
                 if ($res === false) {
                     Notification::warning('Scheduled a new check, got no new result yet');
                 }
@@ -26,7 +36,7 @@ trait HostActionsHelper
             }
         } elseif ($action === 'ack') {
             try {
-                $this->api()->acknowledgeHostProblem(
+                $api->acknowledgeHostProblem(
                     $hostname,
                     $this->Auth()->getUser()->getUsername(),
                     "I'm working on this"
@@ -39,7 +49,7 @@ trait HostActionsHelper
             }
         } elseif ($action === 'removeAck') {
             try {
-                $this->api()->removeHostAcknowledgement($hostname);
+                $api->removeHostAcknowledgement($hostname);
             } catch (Exception $e) {
                 Notification::error(sprintf(
                     'Failed to remove this acknowledgement: %s',
@@ -49,7 +59,7 @@ trait HostActionsHelper
         }
 
         if ($action) {
-            $this->redirectNow($this->getRequest()->getUrl()->without(['action', 'host']));
+            $this->redirectNow($this->getOriginalUrl()->without(['action', 'host']));
         }
     }
 }
