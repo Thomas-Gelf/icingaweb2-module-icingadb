@@ -17,7 +17,7 @@ class IcingaEventHandler
     protected $api;
 
     /** @var IcingaDb */
-    protected $ddo;
+    protected $icingaDb;
 
     /** @var \Zend_Db_Adapter_Abstract */
     protected $db;
@@ -33,13 +33,13 @@ class IcingaEventHandler
 
     /**
      * IcingaEventHandler constructor.
-     * @param IcingaDb $ddo
+     * @param IcingaDb $icingaDb
      */
     public function __construct(IcingaEnvironment $environment)
     {
         $this->environment = $environment;
-        $this->ddo = $environment->getConnection();
-        $this->db = $this->ddo->getDbAdapter();
+        $this->icingaDb = $environment->getConnection();
+        $this->db = $this->icingaDb->getDbAdapter();
         $this->redis = $environment->getRedis();
     }
 
@@ -48,11 +48,9 @@ class IcingaEventHandler
         $time = time();
         $cnt = 0;
         $cntEvents = 0;
-        $ddo = $this->ddo;
-//        $list = new StateList($ddo, $this->redis());
         $envName = $this->environment->get('name');
         $list = new StateList($this->environment, Redis::instance());
-        $subscriberName = 'ddo';
+        $subscriberName = 'IcingaDB';
         $myListName = "icinga:event:$subscriberName";
 
         // TODO: 0 is forever, leave loop after a few sec and enter again
@@ -61,7 +59,7 @@ class IcingaEventHandler
             $redis = $this->redis();
             $this->subscribeMe($redis);
             // MULTI; LRANGE key 0 N-1; LTRIM N -1; EXEC;
-            $responses = $redis->transaction(function ($tx) use ($myListName, $max) {
+            $responses = $redis->transaction(function (Client $tx) use ($myListName, $max) {
                 $tx->lrange($myListName, 0, $max - 1);
                 $tx->ltrim($myListName, $max, -1);
             });
@@ -75,11 +73,12 @@ class IcingaEventHandler
             // responses: 0 -> [], 1 -> Predis\Response\Status -> payload -> "OK"
             $size = 0;
             foreach ($responses[0] as $res) {
+                $result = json_decode($res);
                 $size += strlen($res);
                 $cntEvents++;
                 // Hint: $res = array(queuename, value)
                 // $object = $list->processCheckResult(json_decode($res[1]));
-                $object = $list->processCheckResult(json_decode($res));
+                $object = $list->processCheckResult($result);
                 if ($object === false) {
                     continue;
                 }
@@ -135,8 +134,6 @@ class IcingaEventHandler
             } else {
                 // Logger::info('(%s) Got %d bytes but no event and nothing to commit', $envName, $size);
             }
-
-            $this->checkForMissingObjects($list);
         }
     }
 
@@ -146,7 +143,7 @@ class IcingaEventHandler
             return;
         }
 
-        $redis->setex('icinga:subscription:ddo', 600, json_encode(
+        $redis->setex('icinga:subscription:IcingaDB', 600, json_encode(
             (object) [
                 'types' => [
                     'CheckResult',
@@ -171,16 +168,6 @@ class IcingaEventHandler
         // partition by month? Manually or DB-based?
         // INSERT INTO host_eventhistory (object_checksum, timestamp) VALUES ()
         // duration -> null
-    }
-
-    protected function checkForMissingObjects(StateList $list)
-    {
-        $db = $this->db;
-        $bind = [$this->environment->getNameChecksum()];
-        $stmt = $db->prepare('CALL populate_pending_hosts_for_environment(?)');
-        $stmt->execute($bind);
-        $stmt = $db->prepare('CALL drop_obsolete_host_states_for_environment(?)');
-        $stmt->execute($bind);
     }
 
     protected function wantsTransaction()
@@ -217,6 +204,6 @@ class IcingaEventHandler
         unset($this->redis);
         unset($this->api);
         unset($this->db);
-        unset($this->ddo);
+        unset($this->icingaDB);
     }
 }
