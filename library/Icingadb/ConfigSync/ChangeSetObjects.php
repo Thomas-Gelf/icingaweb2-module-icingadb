@@ -26,6 +26,11 @@ class ChangeSetObjects implements Countable
         return array_keys($this->objects);
     }
 
+    public function getValues()
+    {
+        return $this->objects;
+    }
+
     public function fetchFromRedis(IcingaRedisProxy $proxy, $type)
     {
         if ($this->count() > 2500) {
