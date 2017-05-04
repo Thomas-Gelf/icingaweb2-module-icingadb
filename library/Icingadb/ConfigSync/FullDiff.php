@@ -61,9 +61,34 @@ class FullDiff
         Benchmark::measure(sprintf('Got %d active keys from Redis', $cnt));
         $this->detectObjectModifications();
         Benchmark::measure('Checked for modifications');
-        // TODO -> CALL() $this->createMissingStates();
-        Benchmark::measure('Created missing state entries');
+        if ($this->createMissingStates()) {
+            Benchmark::measure('Created missing state entries');
+        }
+
         return $this->changeSet;
+    }
+
+    protected function createMissingStates()
+    {
+        $db = $this->env->getDb();
+        $bind = [$this->env->getNameChecksum()];
+
+        switch ($this->objectType) {
+            case 'host':
+                $stmt = $db->prepare('CALL populate_pending_hosts_for_environment(?)');
+                $stmt->execute($bind);
+                $stmt = $db->prepare('CALL drop_obsolete_host_states_for_environment(?)');
+                $stmt->execute($bind);
+                return true;
+            case 'service':
+                $stmt = $db->prepare('CALL populate_pending_services_for_environment(?)');
+                $stmt->execute($bind);
+                $stmt = $db->prepare('CALL drop_obsolete_service_states_for_environment(?)');
+                $stmt->execute($bind);
+                return true;
+        }
+
+        return false;
     }
 
     protected function dummyObject()
