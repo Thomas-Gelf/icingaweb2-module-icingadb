@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Icingadb\ConfigSync;
 
+use Icinga\Application\Benchmark;
 use Icinga\Application\Logger;
 use Icinga\Module\Icingadb\IcingaDb;
 use Icinga\Module\Icingadb\IcingaConfigObject\IcingaConfigObject;
@@ -62,21 +63,28 @@ class ChangeSetToDbWriter
         /** @var IcingaConfigObject $class - not really, cheating for the IDE */
         $class = IcingaConfigObject::getClassForType($this->type);
         $typeName = IcingaConfigObject::normalizedTypeName($this->type);
+        $count = 0;
+
         foreach ($this->change->getCreated()->fetchFromRedis(
             $this->redisProxy,
             $typeName
-        ) as $key => $object) {
-            if ($object === null) {
+        ) as $key => $json) {
+            $plain = json_decode($json);
+            if ($plain === null) {
                 Logger::info('Could not find %s on sync', $key);
                 continue;
             }
+            $count++;
 
-            $plain = json_decode($object);
-            $class::fromIcingaObject(
-                    $plain,
-                    $this->env
-            )->store();
+            $object = $class::fromIcingaObject(
+                $plain,
+                $this->env
+            );
+
+            $object->store();
         }
+
+        Benchmark::measure(sprintf('%d new objects will be stored', $count));
     }
 
     protected function storeModifiedObjects()
@@ -84,25 +92,30 @@ class ChangeSetToDbWriter
         /** @var IcingaConfigObject $class - not really, cheating for the IDE */
         $class = IcingaConfigObject::getClassForType($this->type);
         $typeName = IcingaConfigObject::normalizedTypeName($this->type);
+        $count = 0;
 
         foreach ($this->change->getModified()->fetchFromRedis(
             $this->redisProxy,
             $typeName
-        ) as $key => $object) {
-            if ($object === null) {
+        ) as $key => $json) {
+            $plain = json_decode($json);
+            if ($plain === null) {
                 Logger::info('Could not find %s on sync', $key);
                 continue;
             }
+            $count++;
 
-            $plain = json_decode($object);
             $new = $class::fromIcingaObject(
                 $plain,
                 $this->env
             );
+
             $class::load($new->get('global_checksum'), $this->ddo)
                 ->replaceWith($new)
                 ->store();
         }
+
+        Benchmark::measure(sprintf('%d modified objects will be stored', $count));
     }
 
     protected function removeObsoleteObjects()
@@ -112,8 +125,11 @@ class ChangeSetToDbWriter
         $dummy = $class::create([]);
         $envSum = $this->env->getNameChecksum();
         $keys = [];
+        $count = 0;
+
         foreach ($this->change->getDeleted()->getKeys() as $key) {
             $keys[] = sha1($envSum . $key, true);
+            $count++;
         }
 
         $this->db->delete(
@@ -123,5 +139,7 @@ class ChangeSetToDbWriter
                 $keys
             )
         );
+
+        Benchmark::measure(sprintf('%d objects will be deleted', $count));
     }
 }
