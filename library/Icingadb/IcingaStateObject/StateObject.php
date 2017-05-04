@@ -178,6 +178,8 @@ self::ICINGA_WARNING        => 'down', // Really?
         }
     }
 
+    abstract public function setState($state);
+
     public function getGlobalHexChecksum()
     {
         return bin2hex($this->get('global_checksum'));

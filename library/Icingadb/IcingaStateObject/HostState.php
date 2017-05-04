@@ -18,6 +18,16 @@ class HostState extends StateObject
         return self::$hostStateNames[$state];
     }
 
+    public function setState($state)
+    {
+        $state = (int) $state;
+        if ($state === 0 || $state === 1) {
+            $this->reallySet('state', 0);
+        } else {
+            $this->reallySet('state', 2);
+        }
+    }
+
     /**
      * @return HostStateVolatile
      */
