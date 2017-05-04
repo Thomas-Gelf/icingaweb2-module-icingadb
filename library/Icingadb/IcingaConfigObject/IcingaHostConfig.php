@@ -92,7 +92,6 @@ class IcingaHostConfig extends IcingaConfigObject
             // templates: [ "test594.example.com", "Random Fortune", "Default Host" ],
         );
 
-//        var_dump($object); exit;
         $host = static::create($properties, $environment->getConnection());
         $host->calculatePropertiesChecksum();
         $host->calculateVarsChecksum();

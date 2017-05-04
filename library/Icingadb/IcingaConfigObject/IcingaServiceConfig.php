@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Icingadb\IcingaConfigObject;
 
+use Icinga\Exception\IcingaException;
 use Icinga\Module\Icingadb\IcingaEnvironment\IcingaEnvironment;
 
 class IcingaServiceConfig extends IcingaConfigObject
@@ -52,7 +53,6 @@ class IcingaServiceConfig extends IcingaConfigObject
         // "acknowledgement_expiry":0.0,
         //
         $properties = array(
-            'name'                      => $object->__name,
             'environment'               => $environment,
             'label'                     => $object->display_name,
             'groups'                    => $object->groups,
@@ -86,11 +86,50 @@ class IcingaServiceConfig extends IcingaConfigObject
         );
 
         $service = static::create($properties, $environment->getConnection());
-        $service->setHostName($object->host_name);
+        $service->setUniqueName($object->__name);
+        // Hint: we are not using name and host name
         $service->calculatePropertiesChecksum();
         $service->calculateVarsChecksum();
 
         return $service;
+    }
+
+    public function setUniqueName($name)
+    {
+        $pos = strpos($name, '!');
+        if ($pos === false) {
+            throw new IcingaException(
+                '"%s" is not a valid service name',
+                $name
+            );
+        }
+
+        $hostName = substr($name, 0, $pos);
+        $serviceName = substr($name, $pos + 1);
+        $this->setHostName($hostName);
+        $this->setName($serviceName);
+        $checksum = sha1($name, true);
+        $this->set('name_checksum', $checksum);
+        $this->set(
+            'global_checksum',
+            sha1($this->get('env_checksum') . $checksum, true)
+        );
+
+        var_dump($name);
+        var_dump(sha1($name));
+    }
+
+    public function setName($name)
+    {
+        if (strpos($name, '!') !== false) {
+            return $this->setUniqueName($name);
+        };
+
+        if ($name !== $this->get('name')) {
+            parent::reallySet('name', $name);
+            $this->set('name_ci', $name);
+            // TODO: recalculate the checksum? Throw? Fetch the host as we have no name?
+        }
     }
 
     public function setHostName($name)

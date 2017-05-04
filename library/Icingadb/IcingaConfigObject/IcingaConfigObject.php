@@ -43,6 +43,12 @@ abstract class IcingaConfigObject extends DdoObject
         return static::fromIcingaObject($object, $environment);
     }
 
+    /**
+     * @param \stdClass $object
+     * @param IcingaEnvironment $environment
+     * @throws ProgrammingError
+     * @return static
+     */
     public static function fromIcingaObject($object, IcingaEnvironment $environment)
     {
         throw new ProgrammingError('%s did not implement ::propertiesFromIcingaObject()');
@@ -64,9 +70,15 @@ abstract class IcingaConfigObject extends DdoObject
 
     public function setName($name)
     {
-        if ($name !== $this->get('name')) {
-            parent::reallySet('name', $name);
-            $this->set('name_ci', $name);
+        $pos = strpos($name, '!');
+        if ($pos === false) {
+            $myName = $name;
+        } else {
+            $myName = substr($name, $pos + 1);
+        }
+        if ($myName !== $this->get('name')) {
+            parent::reallySet('name', $myName);
+            $this->set('name_ci', $myName);
             $this->set('name_checksum', sha1($name, true));
         }
     }
