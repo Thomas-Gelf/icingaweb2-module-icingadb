@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Icingadb\Controllers;
 
+use Icinga\Module\Icingadb\Web\Component\QuickSearch;
 use ipl\Web\Url;
 use Icinga\Module\Icingadb\Db\StateSummary\HostStateSummary;
 use Icinga\Module\Icingadb\IcingaEnvironment\IcingaEnvironment;
@@ -45,7 +46,10 @@ class HostgroupController extends Controller
             new HostGroupHeader($hostGroup)
         )->add(
             new HostGroupActionBar($hostGroup, $env)
+        )->add(
+            new QuickSearch($this->getRequest())
         );
+
         $this->content()->add($this->getHostsTable());
     }
 }

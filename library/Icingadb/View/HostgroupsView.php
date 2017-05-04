@@ -8,9 +8,18 @@ class HostgroupsView extends ListView
 {
     protected $predis;
 
+    // ugly
+    private $search;
+
     public function getAvailableColumns()
     {
         return [];
+    }
+
+    public function search($string)
+    {
+        $this->search = $string;
+        return $this;
     }
 
     public function getColumns()
@@ -66,7 +75,7 @@ class HostgroupsView extends ListView
 
     protected function prepareSubQuery()
     {
-        return $this->db()
+        $query = $this->db()
             ->select()
             ->from(['hg' => 'hostgroup'], [])
             ->join(['e' => 'icinga_environment'], 'hg.env_checksum = e.name_checksum', [])
@@ -82,5 +91,11 @@ class HostgroupsView extends ListView
             ->group('hg.global_checksum')
             ->group('hs.severity')
             ;
+
+        if (null !== $this->search) {
+            $query->where('hg.name_ci LIKE ?', "%$this->search%");
+        }
+
+        return $query;
     }
 }

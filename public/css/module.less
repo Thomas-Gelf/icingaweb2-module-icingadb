@@ -591,3 +591,62 @@ form {
 }
 
 /** END of forms **/
+
+/** begin quicksearch **/
+div.action-bar form {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+form.quicksearch {
+  &:before {
+    content: '\e85c';
+    color: @icinga-blue;
+    font-family: "ifont";
+    display: inline-block;
+    position: absolute;
+    font-style: normal;
+    font-weight: normal;
+    z-index: -10;
+    speak: none;
+    text-decoration: none;
+    width: 1em;
+    text-align: center;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1em;
+    margin: 0.25em 0.2em 0 0.5em;
+  }
+}
+
+input[type=text].search-link-like {
+    //background: transparent url("../img/icons/search.png") no-repeat scroll 0.5em center / 1em 1em;
+  color: @icinga-blue;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  min-width: initial; // <- really?
+  width: 10em;
+  height: 1.5em;
+  line-height: 1.5em;
+  padding: 0 0 0 2em;
+
+  &:hover {
+    text-decoration: underline;
+  }
+  &:focus {
+    border: none;
+    border-bottom: 1px solid @icinga-blue;
+
+    &:hover {
+      text-decoration: none;
+    }
+
+    &::-webkit-input-placeholder, &:-moz-placeholder, &::-moz-placeholder, &:-ms-input-placeholder {
+      color: @gray-lighter;
+    }
+  }
+}
+/** end of quicksearch **/
