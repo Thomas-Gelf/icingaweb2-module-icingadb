@@ -127,6 +127,18 @@ table.state-table {
     color: white;
   }
 
+  tr.warning span.state {
+    border-color: @color-warning;
+    background-color: @color-warning;
+    color: white;
+  }
+
+  tr.warning.handled span.state {
+    border-color: @color-warning-handled;
+    background-color: @color-warning-handled;
+    color: white;
+  }
+
   tr.pending span.state {
     border-color: @color-pending;
     background-color: @color-pending;
@@ -278,6 +290,10 @@ span.state {
   }
 
   &.up {
+    border-color: @color-up;
+  }
+
+  &.ok {
     border-color: @color-ok;
   }
 }
