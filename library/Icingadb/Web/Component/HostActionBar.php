@@ -11,6 +11,7 @@ class HostActionBar extends ActionBar
 {
     public function __construct(IcingaHostConfig $host, HostState $state)
     {
+        $this->attributes()->add('data-base-target', '_self');
         $this->add(
             Link::create('Acknowledge', 'ack', null, array('class' => 'icon-edit'))
         );
@@ -18,10 +19,15 @@ class HostActionBar extends ActionBar
             Link::create('Check Now', 'ack', null, array('class' => 'icon-reschedule'))
         );
         $this->add(
-            Link::create('Comment', 'ack', null, array('class' => 'icon-comment-empty'))
+            Link::create(
+                'Modify',
+                'director/host/edit',
+                ['name' => $host->name],
+                ['class' => 'icon-edit']
+            )
         );
         $this->add(
-            Link::create('Notification', 'ack', null, array('class' => 'icon-bell'))
+            Link::create('Comment', 'ack', null, array('class' => 'icon-comment-empty'))
         );
         $this->add(
             Link::create('Downtime', 'ack', null, array('class' => 'icon-plug'))
