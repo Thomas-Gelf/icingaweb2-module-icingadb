@@ -136,12 +136,15 @@ self::ICINGA_WARNING        => 'down', // Really?
     public function processCheckResult($result, $timestamp)
     {
         $vars = $result->vars_after;
-        $currentState = (int) $result->state;
+        $oldState = $this->state;
+        $this->set('state', $result->state);
+        $newState = $this->get('state');
 
-        if ($this->state === null || $currentState !== (int) $this->state) {
+        if ($oldState === null || (int) $newState !== (int) $oldState) {
             $this->last_state_change = $timestamp;
         }
-        $this->state        = $currentState;
+        $currentState = (int) $newState;
+
         $this->state_type   = $vars->state_type;
         $this->problem      = $currentState > 0;
         $this->reachable    = $vars->reachable;
@@ -174,7 +177,7 @@ self::ICINGA_WARNING        => 'down', // Really?
         }
 
         if ($this->hasBeenModified()) {
-            $this->last_update = time();
+            $this->last_update = microtime(true);
         }
     }
 
@@ -302,7 +305,22 @@ self::ICINGA_WARNING        => 'down', // Really?
 
         $sev |= $flag;
 
+        $this->fixHandled();
         return $sev;
+    }
+
+    protected function fixHandled()
+    {
+        if ($this->isProblem()) {
+            if ($this->isInDowntime() || $this->isAcknowledged()) {
+                $this->set('handled', 'y');
+            } else {
+                // TODO: Check host state on service
+                $this->set('handled', 'n');
+            }
+        } else {
+            $this->set('handled', 'n');
+        }
     }
 
     public function isProblem()
