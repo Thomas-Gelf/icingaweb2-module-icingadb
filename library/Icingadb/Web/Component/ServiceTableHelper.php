@@ -40,7 +40,7 @@ trait ServiceTableHelper
 
         if ($state = $params->get('state')) {
             $query->where(
-                'state = ?',
+                'ss.state = ?',
                 StateObject::getStateForName($state)
             );
         }
@@ -48,12 +48,12 @@ trait ServiceTableHelper
         if ($handled = $params->get('handled')) {
             if ($handled === 'y') {
                 $query
-                    ->where('acknowledged = ?', $handled)
-                    ->orWhere('in_downtime = ?', $handled);
+                    ->where('ss.acknowledged = ?', $handled)
+                    ->orWhere('ss.in_downtime = ?', $handled);
             } else {
                 $query
-                    ->where('acknowledged = ?', $handled)
-                    ->where('in_downtime = ?', $handled);
+                    ->where('ss.acknowledged = ?', $handled)
+                    ->where('ss.in_downtime = ?', $handled);
             }
         }
 

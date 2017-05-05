@@ -47,7 +47,7 @@ class ServicesTable extends Table
 
     public function getColumnsToBeRendered()
     {
-        return array('renderedState', 'host', 'service');
+        return array('renderedState', 'service');
     }
 
     public function renderStateColumn($row)
@@ -74,7 +74,7 @@ class ServicesTable extends Table
     {
         $hostname = $row->host;
         $service = $row->service;
-        $row->service = [];
+        $row->service = [$hostname];
         $params = [
             'host' => $hostname,
             'name' => $service,

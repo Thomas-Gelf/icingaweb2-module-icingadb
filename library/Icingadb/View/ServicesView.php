@@ -42,6 +42,11 @@ class ServicesView extends ListView
             'acknowledged'      => 'ss.acknowledged',
             'in_downtime'       => 'ss.in_downtime',
             'last_state_change' => 'ss.last_state_change',
+            'host_state'        => 'hs.state',
+            'host_problem'      => 'hs.problem',
+            'host_acknowledged' => 'hs.acknowledged',
+            'host_in_downtime'  => 'hs.in_downtime',
+            'host_last_state_change' => 'hs.last_state_change',
         ];
     }
 
@@ -53,8 +58,12 @@ class ServicesView extends ListView
                 ['h' => 'host_config'],
                 []
             )->join(
+                array('hs' => 'host_state'),
+                'h.global_checksum = hs.global_checksum',
+                array()
+            )->join(
                 array('s' => 'service_config'),
-                'h.global_checksum = s.host_checksum',
+                'hs.global_checksum = s.host_checksum',
                 array()
             )->join(
                 array('ss' => 'service_state'),
@@ -65,8 +74,8 @@ class ServicesView extends ListView
                 'ss.env_checksum = e.name_checksum',
                 []
             )
-            ->order('severity DESC')
-            ->order('last_state_change DESC')
+            ->order('ss.severity DESC')
+            ->order('ss.last_state_change DESC')
             ->limit(25);
         // echo $query;
 
