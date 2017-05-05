@@ -90,7 +90,7 @@ class HostsTable extends Table
         $this->addAckLink($row, $hostname);
 
         if (property_exists($row, 'output') && !empty($row->output)) {
-            $this->addHostOutput($row, $hostname);
+            $this->addHostOutput($row);
         }
     }
 
@@ -140,7 +140,7 @@ class HostsTable extends Table
         );
     }
 
-    protected function addHostOutput($row, $hostname)
+    protected function addHostOutput($row)
     {
         $row->host[] = Element::create(
             'p',

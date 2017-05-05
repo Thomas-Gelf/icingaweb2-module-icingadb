@@ -72,6 +72,11 @@ trait HostsTableHelper
 
             $query->where('EXISTS ?', $sub);
         }
+
+        if ($search = $params->get('search')) {
+            $query->where('h.name LIKE ?', "%$search%");
+        }
+
         $view->addRowObserver('Icinga\\Module\\Icingadb\\IcingaStateObject\\HostStateVolatile::enrichRow');
         $view->addRowObserver(array($table, 'addHostLink'));
         $view->addRowObserver(array($table, 'renderStateColumn'));
