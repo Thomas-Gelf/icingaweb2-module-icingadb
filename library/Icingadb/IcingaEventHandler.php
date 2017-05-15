@@ -7,6 +7,7 @@ use Icinga\Module\Icingadb\IcingaEnvironment\IcingaEnvironment;
 use Icinga\Module\Icingadb\IcingaStateObject\StateObject;
 use Icinga\Module\Director\Core\CoreApi;
 use Predis\Client;
+use Predis\Transaction\MultiExec;
 
 class IcingaEventHandler
 {
@@ -59,7 +60,7 @@ class IcingaEventHandler
             $redis = $this->redis();
             $this->subscribeMe($redis);
             // MULTI; LRANGE key 0 N-1; LTRIM N -1; EXEC;
-            $responses = $redis->transaction(function (Client $tx) use ($myListName, $max) {
+            $responses = $redis->transaction(function (MultiExec $tx) use ($myListName, $max) {
                 $tx->lrange($myListName, 0, $max - 1);
                 $tx->ltrim($myListName, $max, -1);
             });
